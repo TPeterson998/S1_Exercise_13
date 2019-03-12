@@ -68,19 +68,21 @@ function init() {
             puzzleButtons[i].onclick = swapPuzzle;
       }
       setupPuzzle();
-}
-// Add an event listener for the mouseup event
-document.addEventListener("mouseup", endBackground);
 
-//add an event listner to show solution button 
-document.getElementById("solve").addEventListener("click", function () {
-      //remove the inline background color style from each cell
-      for (var i = 0; i < puzzleCells.length; i++) {
-            puzzleCells[i].style.backgroundColor = "";
-      }
-});
+      // Add an event listener for the mouseup event
+      document.addEventListener("mouseup", endBackground);
+
+      //add an event listner to show solution button 
+      document.getElementById("solve").addEventListener("click", function () {
+            //remove the inline background color style from each cell
+            for (var i = 0; i < puzzleCells.length; i++) {
+                  puzzleCells[i].style.backgroundColor = "";
+            }
+      });
+}
 
 function swapPuzzle(e) {
+      if (confirm("You will lose all of your work on the puzzle doofus! Continue?")) {
       // Retrieve the id of the clicked button 
       var puzzleID = e.target.id;
       // retrive the value of the clicked button
@@ -101,6 +103,7 @@ function swapPuzzle(e) {
       }
       setupPuzzle();
 }
+}
 
 function setupPuzzle() {
       //match all of the data cells in the puzzle
@@ -114,17 +117,48 @@ function setupPuzzle() {
             puzzleCells[i].style.cursor = "url(jpf_pencil.png), pointer";
       }
       // create object collections of the filled and empty cells
-      var filled = document.querySelectorAll("table#hanjiGrid td.filled");
-      var empty = document.querySelectorAll("table#hanjiGrid td.filled");
+      var filled = document.querySelectorAll("table#hanjieGrid td.filled");
+      var empty = document.querySelectorAll("table#hanjieGrid td.empty");
       //cretae an event listener to highlight incorrect cells
       document.getElementById("peek").addEventListener("click", function () {
             //display white cells in  pink
-            for (var i = 0; i < filled.legth; i++) {
-                  if (filled[i].style.backgroundColor === "rgb(255,255,255)") {
-                        filled[i].style.backgroundColor = "rgb(255,211,211)";
+            for (var i = 0; i < filled.length; i++) {
+                  if (filled[i].style.backgroundColor === "rgb(255, 255, 255)") {
+                        filled[i].style.backgroundColor = "rgb(255, 211, 211)";
                   }
             }
+            //display incorrect gray cells in red
+            for (var i = 0; i < empty.length; i++) {
+                  if (empty[i].style.backgroundColor === "rgb(101, 101, 101)") {
+                        empty[i].style.backgroundColor = "rgb(255, 101, 101)";
+                  }
+            }
+            //remove the hints after 0.5 seconds
+            setTimeout(
+                  function () {
+                        for (var i = 0; i < puzzleCells.length; i++) {
+                              if (puzzleCells[i].style.backgroundColor === "rgb(255, 211, 211)") {
+                                    puzzleCells[i].style.backgroundColor = "rgb(255, 255, 255)";
+                              }
+                              if (puzzleCells[i].style.backgroundColor === "rgb(255, 101, 101)") {
+                                    puzzleCells[i].style.backgroundColor = "rgb(101, 101, 101)";
+                              }
+                        }
+                  }, 500);
       });
+      // check the puzzle solution
+      document.getElementById("hanjieGrid").addEventListener("mouseup", function(){
+            var solved = true;
+            for (var i = 0; i < puzzleCells.length; i++) {
+                  if ((puzzleCells[i].className==="filled") && (puzzleCells[i].style.backgroundColor !== "rgb(101, 101, 101)") || (puzzleCells[i].className==="empty") && (puzzleCells[i].style.backgroundColor === "rgb(101, 101, 101)")) {
+                        solved=false
+                        break;
+                  }
+            }
+            if (solved){
+                  alert("You solved the PUZZLE!!!");
+            }
+      })
 }
 
 function setBackground(e) {
